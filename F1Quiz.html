@@ -1,0 +1,231 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rapidus Racers | Quiz Game</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Canva+Sans&display=swap');
+            body {
+                font-family: 'Canva Sans', Arial, sans-serif;
+                text-align: center;
+                margin: 0;
+                padding: 0;
+                background-color: rgb(181, 181, 156);
+                color: #006e63;
+            }
+            .quiz-container {
+                margin: 20px auto;
+                max-width: 600px;
+                padding: 20px;
+                border: 5px solid #006e63;
+                border-radius: 10px;
+                background-color: #111111;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            h1 {
+                color: #006e63;
+            }
+            .question, .result-message {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            .options {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .button {
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #ffffff;
+                background-color: #006e63;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+            .button:hover {
+                background-color: #004d46;
+                transform: scale(1.05);
+            }
+            .leaderboard {
+                margin-top: 20px;
+                overflow: hidden;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                color: rgb(181, 181, 156);
+                background-color: black;
+            }
+            th, td {
+                border: 1px solid #ffffff;
+                padding: 8px;
+                text-align: center;
+            }
+            th {
+                background-color: #006e63;
+            }
+            tbody tr {
+                opacity: 0;
+                transform: translateY(10px);
+                transition: opacity 0.4s ease, transform 0.4s ease;
+            }
+            .leaderboard:hover tbody tr {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .leaderboard:hover tbody tr:nth-child(1) { transition-delay: 0.1s; }
+            .leaderboard:hover tbody tr:nth-child(2) { transition-delay: 0.2s; }
+            .leaderboard:hover tbody tr:nth-child(3) { transition-delay: 0.3s; }
+            .leaderboard:hover tbody tr:nth-child(4) { transition-delay: 0.4s; }
+            .leaderboard:hover tbody tr:nth-child(5) { transition-delay: 0.5s; }
+            .leaderboard:hover tbody tr:nth-child(6) { transition-delay: 0.6s; }
+            .leaderboard:hover tbody tr:nth-child(7) { transition-delay: 0.7s; }
+            .leaderboard:hover tbody tr:nth-child(8) { transition-delay: 0.8s; }
+            .leaderboard:hover tbody tr:nth-child(9) { transition-delay: 0.9s; }
+            .leaderboard:hover tbody tr:nth-child(10) { transition-delay: 1s; }
+
+            #logo {
+            width: 200px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="jumbotron jumbotron-fluid">
+            <h1 class="display-2">Rapidus Racers</h1>
+            <br>
+            <img id="logo" src="RapidusRacers_Logo.png" alt="Rapidus Racers Logo">
+            <br>
+        </div>
+        <div class="quiz-container">
+            <h1>F1 Quiz Game</h1>
+            <div id="quiz">
+                <div class="question" id="question">Loading question...</div>
+                <div class="options" id="options"></div>
+            </div>
+            <div id="results" style="display: none;">
+                <div class="result-message" id="resultMessage"></div>
+                <button class="button" id="restartButton">Restart Quiz</button>
+            </div>
+        </div>
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+        </div>
+        <script>
+            const questions = [
+                { question: 'Which team has won the most Constructors\' Championships?', answers: ['Ferrari', 'Mercedes', 'Red Bull', 'McLaren'], correct: 0 },
+                { question: 'Who holds the record for the most F1 race wins?', answers: ['Lewis Hamilton', 'Michael Schumacher', 'Ayrton Senna', 'Sebastian Vettel'], correct: 0 },
+                { question: 'Which F1 circuit is known as the "Temple of Speed"?', answers: ['Silverstone', 'Monza', 'Spa-Francorchamps', 'Suzuka'], correct: 1 },
+                { question: 'Which driver has the most pole positions in F1 history?', answers: ['Ayrton Senna', 'Michael Schumacher', 'Lewis Hamilton', 'Max Verstappen'], correct: 2 },
+                { question: 'What year was the first Formula 1 race held?', answers: ['1984', '1961', '1953', '1950'], correct: 3 },
+                { question: 'Which circuit hosted the very first Formula 1 Grand Prix?', answers: ['Monza', 'Suzuka', 'Silverstone', 'Spa-Francorchamps'], correct: 2 },
+                { question: 'Which F1 driver famously said, “I am not here to make friends”?', answers: ['Max Verstappen', 'Michael Schumacher', 'Lewis Hamilton', 'Ayrton Senna'], correct: 0 },
+                { question: 'What is the primary material used in the construction of an F1 car\'s monocoque?', answers: ['Tempered Glass', 'Plastic', 'Carbon Fibre', 'Rubber'], correct: 2 },
+                { question: 'In what year did the "Crashgate" scandal occur?', answers: ['2005', '2011', '1993', '2013'], correct: 1 },
+                { question: 'Which driver won the Monaco Grand Prix the most times?', answers: ['Ayrton Senna', 'Michael Schumacher', 'Lewis Hamilton', 'Max Verstappen'], correct: 0 }
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let leaderboard = JSON.parse(localStorage.getItem('f1QuizLeaderboard')) || [];
+
+            const questionElement = document.getElementById('question');
+            const optionsElement = document.getElementById('options');
+            const resultsElement = document.getElementById('results');
+            const resultMessageElement = document.getElementById('resultMessage');
+            const restartButton = document.getElementById('restartButton');
+            const leaderboardBody = document.getElementById('leaderboardBody');
+
+            function loadQuestion() {
+                resultsElement.style.display = 'none';
+                const currentQuestion = questions[currentQuestionIndex];
+                questionElement.textContent = currentQuestion.question;
+                optionsElement.innerHTML = '';
+
+                currentQuestion.answers.forEach((answer, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = answer;
+                    button.classList.add('button');
+                    button.addEventListener('click', () => handleAnswer(index));
+                    optionsElement.appendChild(button);
+                });
+            }
+
+            function handleAnswer(selectedIndex) {
+                const currentQuestion = questions[currentQuestionIndex];
+                if (selectedIndex === currentQuestion.correct) {
+                    score++;
+                }
+
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex < questions.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }
+
+            function showResults() {
+                questionElement.style.display = 'none';
+                optionsElement.style.display = 'none';
+                resultsElement.style.display = 'block';
+                resultMessageElement.textContent = `You scored ${score} out of ${questions.length}!`;
+
+                const playerName = prompt('Quiz Over! Enter your name for the leaderboard:');
+                if (playerName) {
+                    leaderboard.push({ name: playerName, score });
+                    updateLeaderboard();
+                }
+            }
+
+            function restartQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                questionElement.style.display = 'block';
+                optionsElement.style.display = 'flex';
+                resultsElement.style.display = 'none';
+                loadQuestion();
+            }
+
+            function updateLeaderboard() {
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 10);
+
+                leaderboardBody.innerHTML = '';
+                leaderboard.forEach((entry, index) => {
+                    const row = `<tr>
+                                    <td>${index + 1}</td>
+                                    <td>${entry.name}</td>
+                                    <td>${entry.score}</td>
+                                </tr>`;
+                    leaderboardBody.innerHTML += row;
+                });
+
+                console.log('Leaderboard before saving to localStorage:', leaderboard);
+
+                localStorage.setItem('f1QuizLeaderboard', JSON.stringify(leaderboard));
+            }
+
+            restartButton.addEventListener('click', restartQuiz);
+
+            loadQuestion();
+            updateLeaderboard();
+            
+        </script>
+
+    </body>
+</html>

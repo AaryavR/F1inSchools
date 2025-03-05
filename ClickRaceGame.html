@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapidus Racers | Speed Click Challenge</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        h2 {
+            color: #006e63;
+        }
+        body {
+            font-family: 'Canva Sans', Arial, sans-serif;
+            text-align: center;
+            background-color: rgb(181, 181, 156);
+            color: #ffffff;
+        }
+        .jumbotron {
+            background-color: #006e63;
+            border: 5px solid black;
+            padding: 20px;
+            color: white;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .track {
+            width: 80%;
+            height: 50px;
+            margin: 20px auto;
+            background: gray;
+            position: relative;
+            border: 5px solid #006e63;
+            border-radius: 25px;
+        }
+        .finish-line {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 10px;
+            height: 100%;
+            background: repeating-linear-gradient(45deg, black, black 5px, white 5px, white 10px);
+        }
+        .car {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.1s ease-in-out;
+        }
+        #moveButton, #restartButton, #restartResultsButton {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #ffffff;
+            background-color: #006e63;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #moveButton:hover, #restartButton:hover, #restartResultsButton:hover {
+            background-color: #004d46;
+            transform: scale(1.1);
+        }
+        #resultsPage {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            color: #ffffff;
+            background-color: black;
+            transition: max-height 0.5s ease-out;
+            max-height: 0;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ffffff;
+            padding: 8px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        th {
+            background-color: #006e63;
+        }
+        table:hover {
+            max-height: 500px;
+        }
+        table:hover th, table:hover td {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="jumbotron">
+        <h1>Rapidus Racers Speed Challenge</h1>
+        <p>Click as fast as you can to move your car! Beat the opponent car to the finish line! Your car is the one on the bottom.</p>
+    </div>
+    <div id="racePage">
+        <div class="track">
+            <div class="finish-line"></div>
+            <img src="F1_Car_R.png" class="car" id="cpuCar"> 
+        </div>
+        <div class="track">
+            <div class="finish-line"></div>
+            <img src="F1_Car_R.png" class="car" id="playerCar"> 
+        </div>
+        <button id="moveButton">Click to Speed Up!</button>
+        <button id="restartButton">Restart</button>
+    </div>
+    <div id="resultsPage">
+        <h2>Race Finished!</h2>
+        <p id="resultTime"></p>
+        <button id="restartResultsButton">Restart</button>
+    </div>
+    <br><br>
+    <h2>Leaderboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Time (s)</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+    </table>
+    <script>
+        let playerPos = 0;
+        let cpuPos = 0;
+        let cpuSpeed = 1.5;
+        let playerClicks = 0;
+        let startTime, interval;
+
+        function startGame() {
+            playerPos = 0;
+            cpuPos = 0;
+            playerClicks = 0;
+            document.getElementById('playerCar').style.left = '0px';
+            document.getElementById('cpuCar').style.left = '0px';
+            startTime = Date.now();
+            interval = setInterval(moveCpuCar, 100);
+        }
+
+        function moveCpuCar() {
+            cpuPos += cpuSpeed;
+            document.getElementById('cpuCar').style.left = cpuPos + 'px';
+            checkWin();
+        }
+
+        function movePlayerCar() {
+            if (playerClicks === 0) startGame();
+            playerClicks++;
+            playerPos += 10;
+            document.getElementById('playerCar').style.left = playerPos + 'px';
+            checkWin();
+        }
+
+        function checkWin() {
+            let trackWidth = document.querySelector('.track').clientWidth;
+            if (playerPos >= trackWidth - 60) {
+                clearInterval(interval);
+                let timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
+                document.getElementById('racePage').style.display = 'none';
+                document.getElementById('resultsPage').style.display = 'block';
+                document.getElementById('resultTime').textContent = `Your Time: ${timeTaken} seconds`;
+                let playerName = prompt('You Won! Enter Your Name:');
+                if (playerName) saveScore(playerName, timeTaken);
+                updateLeaderboard();
+            } else if (cpuPos >= trackWidth - 60) {
+                clearInterval(interval);
+                alert('You Lost! Try Again.');
+                resetGame();
+            }
+        }
+
+        function saveScore(name, time) {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            leaderboard.push({ name, time });
+            leaderboard.sort((a, b) => a.time - b.time);
+            leaderboard = leaderboard.slice(0, 10);
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+        }
+
+        function updateLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            let tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+            leaderboard.forEach((entry, index) => {
+                let row = document.createElement('tr');
+                row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.time}s</td>`;
+                tbody.appendChild(row);
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        }
+
+        function resetGame() {
+            clearInterval(interval);
+            document.getElementById('racePage').style.display = 'block';
+            document.getElementById('resultsPage').style.display = 'none';
+            startGame();
+        }
+
+        document.getElementById('moveButton').addEventListener('click', movePlayerCar);
+        document.getElementById('restartButton').addEventListener('click', resetGame);
+        document.getElementById('restartResultsButton').addEventListener('click', resetGame);
+        updateLeaderboard();
+    </script>
+</body>
+</html>

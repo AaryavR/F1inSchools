@@ -1,0 +1,109 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>F1 Joke Generator</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <style>
+            body {
+                font-family: 'Canva Sans', Arial, sans-serif;
+                text-align: center;
+                background-color: rgb(181, 181, 156);
+                color: #ffffff;
+                overflow: hidden;
+            }
+            .jumbotron {
+                background-color: #006e63;
+                border: 5px solid black;
+                padding: 20px;
+                color: white;
+                animation: fadeIn 1s ease-in-out;
+            }
+            #jokeContainer {
+                font-size: 24px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: black;
+                border: 5px solid #006e63;
+                border-radius: 10px;
+                max-width: 600px;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            }
+            #jokeButton {
+                margin: 10px;
+                padding: 10px 20px;
+                font-size: 18px;
+                color: #ffffff;
+                background-color: #006e63;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+            #jokeButton:hover {
+                background-color: #004d46;
+                transform: scale(1.05);
+            }
+            #logo {
+                width: 150px;
+                margin-top: 20px;
+                opacity: 0;
+                transform: scale(0.5);
+                animation: fadeInScale 1s ease-in-out forwards;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeInScale {
+                from { opacity: 0; transform: scale(0.5); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <h1>F1 Joke Generator</h1>
+            <p>Click the button below to generate an F1 joke!</p>
+        </div>
+        
+        <div id="jokeContainer">Press the button for a joke!</div>
+        <button id="jokeButton">Get a Joke!</button>
+        <br><br>
+        <img id="logo" src="RapidusRacers_Logo.png" alt="Rapidus Racers Logo">
+
+        <script>
+            const jokes = [
+                "Why did the F1 driver bring a ladder? Because he wanted to climb up the standings!",
+                "I told my car a joke… but it didn’t laugh. It just stalled.",
+                "Why do F1 drivers make great baristas? Because they know how to handle the press!",
+                "Lewis Hamilton walks into a bar… and still finishes first.",
+                "What’s an F1 driver’s favorite kind of music? Pit-stop!",
+                "Why did the F1 driver break up with his GPS? It kept telling him to slow down!",
+                "Max Verstappen doesn’t play chess. He only knows how to go straight to checkmate!",
+                "Why do F1 cars make terrible pets? Because they always run away!",
+                "What do you call an F1 car that won’t start? A Max Verstuck-en!",
+                "Why did the F1 driver refuse to play cards? Because he was afraid of getting lapped!",
+                "Why did Ferrari open a bakery? Because they’re great at making dough but bad at keeping their lead!", 
+                "What do you call a Red Bull driver at the back of the grid? Fictional.",
+                "What’s the difference between Mercedes' race strategy and my WiFi? One only works at home!",
+                "What’s an F1 driver’s least favorite song? Slow Down by Bobby Valentino.",
+                "I LOVE F1!! Does that make me a racist?"
+            ];
+
+            document.getElementById('jokeButton').addEventListener('click', function() {
+                let randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+                let jokeContainer = document.getElementById('jokeContainer');
+                jokeContainer.style.opacity = '0';
+                jokeContainer.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    jokeContainer.innerText = randomJoke;
+                    jokeContainer.style.opacity = '1';
+                    jokeContainer.style.transform = 'translateY(0)';
+                }, 300);
+            });
+        </script>
+    </body>
+</html>
